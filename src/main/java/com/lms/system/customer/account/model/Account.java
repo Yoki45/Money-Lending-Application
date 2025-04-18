@@ -21,7 +21,7 @@ public class Account extends BaseEntity {
     @Id
     private Long accountNumber;
 
-    @JoinColumn(name = "Customer", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "customer", referencedColumnName = "id", nullable = false)
     @OneToOne(cascade = CascadeType.ALL)
     private User customer;
 

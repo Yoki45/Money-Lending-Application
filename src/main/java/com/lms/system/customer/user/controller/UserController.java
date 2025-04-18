@@ -22,7 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/customer", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 @Tag(name = "APIs for user Registration",
         description = " ")
@@ -42,9 +42,8 @@ public class UserController {
             )
     }
     )
-    @PostMapping
+    @PostMapping("register")
     public ResponseEntity<ResponseDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
-        log.info("Creating user: {}", userDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDTO(Utils.STATUS_201, userService.createUser(userDTO)));
