@@ -1,24 +1,20 @@
-package com.lms.system.loans.model;
+package com.lms.system.product.model;
+
 
 import com.lms.generic.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
 @Getter
 @Setter
-@Table(name="credit_histories")
+@Table(name="products")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreditHistory  extends BaseEntity {
+@Entity
+public class Product extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
-
-
-
 }
