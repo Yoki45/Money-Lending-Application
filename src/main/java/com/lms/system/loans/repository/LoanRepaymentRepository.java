@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface LoanRepaymentRepository extends JpaRepository<LoanRepaymentHistory,Long> {
 
-    @Query("SELECT lr FROM LoanRepaymentHistory lr where lr.loan in : loans")
+    @Query("SELECT lr FROM LoanRepaymentHistory lr where lr.loan in :loans")
     List<LoanRepaymentHistory> findMonthlyRepaymentHistoryByLoans(List<Loan> loans);
 
 }

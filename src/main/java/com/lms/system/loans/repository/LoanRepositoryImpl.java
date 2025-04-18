@@ -35,7 +35,7 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
 
         if (statuses.isEmpty()) statuses = Arrays.asList(LoanStatus.OVERDUE);
 
-        Query query = em.createQuery("select l from Loan l where l.account.accountNumber = :account AND l.product = :product AND l.status in :statuses");
+        Query query = em.createQuery("select l from Loan l where l.account.accountNumber = :account AND l.product.id = :product AND l.status in :statuses");
         query.setParameter("account", accountNumber);
         query.setParameter("product", product);
         query.setParameter("statuses", statuses);

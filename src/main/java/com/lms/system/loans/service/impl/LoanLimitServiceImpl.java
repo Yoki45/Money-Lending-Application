@@ -92,11 +92,12 @@ public class LoanLimitServiceImpl implements ILoanLimitService {
             loanLimit.setCustomer(user);
             loanLimit.setLimit(maxLoanAmount);
             loanLimit.setCategory(risk);
-            loanLimitRepository.save(loanLimit);
+           loanLimit = loanLimitRepository.save(loanLimit);
 
             LoanLimitHistory history = LoanLimitHistory.builder()
                     .loanLimit(loanLimit)
                     .limit(maxLoanAmount)
+                    .category(risk)
                     .build();
             loanLimitHistoryRepository.save(history);
 

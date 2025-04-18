@@ -45,7 +45,7 @@ public class LoanCreationTopicConfig {
                 .build();
     }
 
-    public ConsumerFactory<String, LoanRequestDTO> userConsumerFactory() {
+    public ConsumerFactory<String, LoanRequestDTO> loanRequestDTOConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(
                 properties,
                 new StringDeserializer(),
@@ -55,7 +55,7 @@ public class LoanCreationTopicConfig {
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, LoanRequestDTO> loanCreationKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, LoanRequestDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(userConsumerFactory());
+        factory.setConsumerFactory(loanRequestDTOConsumerFactory());
         return factory;
     }
 }

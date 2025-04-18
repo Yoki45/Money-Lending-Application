@@ -2,7 +2,7 @@ package com.lms.system.notifications.kafka.consumer.loan.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lms.generic.exception.NotFoundException;
+import com.lms.system.customer.account.enums.ActiveStatus;
 import com.lms.system.customer.account.model.Account;
 import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.user.model.User;
@@ -17,6 +17,7 @@ import com.lms.system.loans.repository.LoanInstallmentRepository;
 import com.lms.system.loans.repository.LoanLimitRepository;
 import com.lms.system.loans.repository.LoanRepository;
 import com.lms.system.notifications.kafka.consumer.loan.ILoanConsumerService;
+import com.lms.system.notifications.messaging.email.service.IEmailService;
 import com.lms.system.product.enums.TenureType;
 import com.lms.system.product.model.Product;
 import com.lms.system.product.model.ProductFee;
@@ -25,10 +26,13 @@ import com.lms.system.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.lms.utils.Utils.MINIMUM_CREDIT_SCORE;
 
@@ -36,6 +40,7 @@ import static com.lms.utils.Utils.MINIMUM_CREDIT_SCORE;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class LoanConsumerServiceImpl implements ILoanConsumerService {
 
 
@@ -55,12 +60,10 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
 
     private final LoanInstallmentRepository loanInstallmentRepository;
 
+    private final IEmailService emailService;
+
     @Override
-    public void processLoanRequest(String message) throws JsonProcessingException {
-
-        log.info("Received message: {}", message);
-
-        LoanRequestDTO request = objectMapper.readValue(message, LoanRequestDTO.class);
+    public void processLoanRequest(LoanRequestDTO request) throws JsonProcessingException {
 
         log.info("Received message mapped : {}", request.toString());
 
@@ -76,15 +79,16 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
             CreditScore creditScore = creditScoreRepository.findCreditScoreByUser(user);
 
             if (creditScore == null || creditScore.getScore() < MINIMUM_CREDIT_SCORE) {
-                notifyUser(user, "Loan rejected: your credit score is too low.");
+                emailService.sendEmailRejectionDueToLowCreditScore(user, creditScore);
                 return;
             }
 
 
             List<ProductFee> fees = productFeeRepository.findByProduct(product);
             List<ProductFee> disbursementFees = fees.stream()
-                    .filter(ProductFee::getApplyOnDisbursement)
-                    .toList();
+                    .filter(fee -> fee.getApplyOnDisbursement() && fee.getActiveStatus().equals(ActiveStatus.ACTIVE))
+                    .collect(Collectors.toList());
+
 
             double feeTotal = calculateDisbursementFees(request.getAmount(), disbursementFees);
             double loanBalance = request.getAmount() + feeTotal;
@@ -101,14 +105,17 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
                     .build();
             loanRepository.save(loan);
 
-            createInstallmentsForLoan(loan, product, request.getNumberOfInstallments());
+            List<LoanInstallment> installments = createInstallmentsForLoan(loan, product, request.getNumberOfInstallments());
+            loanInstallmentRepository.saveAll(installments);
 
-            notifyUser(user, "Loan approved! Amount: " + request.getAmount() + ". Due by: " + firstDueDate);
+
+            emailService.sendLoanApprovalEmail(request, user, firstDueDate);
 
         } catch (Exception e) {
             log.error("Error processing loan for account {}: {}", request.getAccountNumber(), e.getMessage(), e);
         }
     }
+
 
 
     private LocalDate calculateDueDate(TenureType type, Integer value) {
@@ -124,7 +131,9 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
     }
 
 
-    private void createInstallmentsForLoan(Loan loan, Product product, int count) {
+    private List<LoanInstallment> createInstallmentsForLoan(Loan loan, Product product, int count) {
+        List<LoanInstallment> loanInstallments = new ArrayList<>();
+
         double installmentAmount = loan.getBalance() / count;
         LocalDate start = LocalDate.now();
 
@@ -141,19 +150,10 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
                     .paymentStatus(PaymentStatus.NOT_PAID)
                     .build();
 
-            loanInstallmentRepository.save(installment); // Assume repo exists
+            loanInstallments.add(installment);
+
         }
-    }
-
-
-    private void notifyUser(User user, String message) {
-        // You can publish to Kafka or call NotificationService
-//        NotificationEvent event = NotificationEvent.builder()
-//                .userId(user.getId())
-//                .channel("SMS") // could be dynamic
-//                .message(message)
-//                .build();
-//        kafkaTemplate.send("notifications", event);
+        return loanInstallments;
     }
 
 }

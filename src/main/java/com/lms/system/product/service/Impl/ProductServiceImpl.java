@@ -13,11 +13,13 @@ import com.lms.system.product.repository.ProductRepository;
 import com.lms.system.product.service.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductServiceImpl implements IProductService {
 
 
@@ -39,6 +41,7 @@ public class ProductServiceImpl implements IProductService {
                 .name(productDTO.getName())
                 .tenureType(productDTO.getTenureType())
                 .tenureValue(productDTO.getTenureValue())
+                .activeStatus(ActiveStatus.ACTIVE)
                 .build();
 
         product = productRepository.save(product);
@@ -50,6 +53,7 @@ public class ProductServiceImpl implements IProductService {
                         .feeType(dto.getFeeType())
                         .amount(dto.getAmount())
                         .isPercentage(dto.getIsPercentage())
+                        .activeStatus(ActiveStatus.ACTIVE)
                         .applyOnDisbursement(dto.getApplyOnDisbursement())
                         .triggerDaysAfterDue(dto.getTriggerDaysAfterDue())
                         .build())
@@ -105,13 +109,14 @@ public class ProductServiceImpl implements IProductService {
                         .feeType(dto.getFeeType())
                         .amount(dto.getAmount())
                         .isPercentage(dto.getIsPercentage())
+                        .activeStatus(ActiveStatus.ACTIVE)
                         .applyOnDisbursement(dto.getApplyOnDisbursement())
                         .triggerDaysAfterDue(dto.getTriggerDaysAfterDue())
                         .build())
                 .toList();
+
         productFeeRepository.saveAll(updatedFees);
 
-        product.setFees(updatedFees);
         productRepository.save(product);
 
         return localizationService.getMessage("message.product.updateSuccess", null);

@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(
                                 "/actuator/**", "/swagger-ui/**", "/v3/api-docs/**",
-                                "/actuator/health", "/register/**")
+                                "/actuator/health", "/customer/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

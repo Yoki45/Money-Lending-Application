@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @ToString
@@ -22,7 +23,7 @@ public class BaseEntity {
     @Column(nullable = false,  updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private LocalDateTime createdOn;
+    private Date createdOn;
 
     @ManyToOne
     @JoinColumn(name = "created_by", updatable = false)
@@ -32,7 +33,7 @@ public class BaseEntity {
     @Column(insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-    private LocalDateTime updatedOn;
+    private Date updatedOn;
 
     @ManyToOne
     @JoinColumn(name = "updated_by", insertable = false)
