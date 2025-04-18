@@ -25,6 +25,8 @@ public class UserDTO {
     @Schema(description = "Role of the customer", example = "USER")
     private String role;
 
+    @Schema(description = "Phone of the customer", example = "0708692229")
+    private String phoneNumber;
 
     @Schema(description = "Full name of the customer", example = "John Doe")
     private String name;

@@ -33,14 +33,14 @@ public class UserServiceImpl implements IUserService {
 
     private final IAccountService accountService;
 
-    private  final ILocalizationService localizationService;
+    private final ILocalizationService localizationService;
 
 
     @Override
     public UserDTO login(LoginDTO loginDTO) {
 
         if (loginDTO == null) {
-            throw new BadRequestException(localizationService.getMessage("message.missing.validDetails",null));
+            throw new BadRequestException(localizationService.getMessage("message.missing.validDetails", null));
         }
 
         String username = loginDTO.getUsername();
@@ -48,11 +48,11 @@ public class UserServiceImpl implements IUserService {
         Authentication authenticate = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(username, password));
         if (!authenticate.isAuthenticated()) {
-            throw new BadCredentialsException(localizationService.getMessage("message.user.Wrong.Credentials",null));
+            throw new BadCredentialsException(localizationService.getMessage("message.user.Wrong.Credentials", null));
         }
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null) {
-            throw new BadRequestException(localizationService.getMessage("message.user.NotFound",null));
+            throw new BadRequestException(localizationService.getMessage("message.user.NotFound", null));
         }
 
 
@@ -66,18 +66,19 @@ public class UserServiceImpl implements IUserService {
     public String createUser(UserDTO userDTO) {
 
         if (userDTO == null) {
-            throw new BadRequestException(localizationService.getMessage("message.missing.validDetails",null));
+            throw new BadRequestException(localizationService.getMessage("message.missing.validDetails", null));
         }
 
 
         boolean userExists = userRepository.findByUsername(userDTO.getUsername()).isPresent();
         if (userExists) {
-            throw new BadRequestException(localizationService.getMessage("message.user.userAlreadyExists",null));
+            throw new BadRequestException(localizationService.getMessage("message.user.userAlreadyExists", null));
         }
 
         String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
         User user = User.builder()
                 .password(encryptedPassword)
+                .phone(userDTO.getPhoneNumber())
                 .username(userDTO.getUsername())
                 .name(userDTO.getName()).build();
 
@@ -86,7 +87,7 @@ public class UserServiceImpl implements IUserService {
         accountService.createNewAccount(user, userDTO.getAccountDetails());
 
 
-        return localizationService.getMessage("message.user.userCreated.success",null);
+        return localizationService.getMessage("message.user.userCreated.success", null);
 
     }
 
@@ -100,8 +101,6 @@ public class UserServiceImpl implements IUserService {
         currentUserDTO.setRefreshToken(refreshToken);
         return currentUserDTO;
     }
-
-
 }
 
 
