@@ -12,5 +12,8 @@ import java.util.List;
 public interface LoanLimitRepository extends JpaRepository<LoanLimit, Long> {
 
     @Query("SELECT lm FROM LoanLimit lm WHERE lm.customer IN :users")
-    List<LoanLimit> findLoanLimitsByUser(List<User> users);
+    List<LoanLimit> findLoanLimitsByUsers(List<User> users);
+
+    @Query("SELECT cr from LoanLimit  cr where  cr.customer = :user")
+    LoanLimit findLoanLimitByUser(User user);
 }

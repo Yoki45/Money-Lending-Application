@@ -18,10 +18,10 @@ public class CreditScoreHistory extends BaseEntity {
     private Long id;
 
     @JoinColumn(name = "credit_score", referencedColumnName = "id", nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private CreditScore creditScore;
 
-    @Column(name = "limit")
+    @Column(name = "score_value")
     private Double  score = 0d;
 
 }

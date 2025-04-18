@@ -14,4 +14,8 @@ public interface CreditScoreRepository  extends JpaRepository<CreditScore, Long>
     @Query("SELECT cr from CreditScore  cr where  cr.customer in :users")
     List<CreditScore> findCreditScoreByUsers(List<User> users);
 
+    @Query("SELECT cr from CreditScore  cr where  cr.customer = :user")
+    CreditScore findCreditScoreByUser(User user);
+
+
 }

@@ -9,7 +9,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name="loan_repayment_histories")
+@Table(name= "loan_repayment_histories")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,8 +19,8 @@ public class LoanRepaymentHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "loan", referencedColumnName = "id", nullable = false)
-    @ManyToOne(cascade = CascadeType.ALL)
     private Loan loan;
 
     @Column(name = "amount")

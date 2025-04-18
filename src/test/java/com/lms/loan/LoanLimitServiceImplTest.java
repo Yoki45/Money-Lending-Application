@@ -61,7 +61,7 @@ public class LoanLimitServiceImplTest {
         when(userRepository.findAll()).thenReturn(List.of(user));
         when(creditScoreRepository.findCreditScoreByUsers(List.of(user))).thenReturn(List.of(creditScore));
         when(accountRepository.findAccountByCustomers(List.of(user))).thenReturn(List.of(account));
-        when(loanLimitRepository.findLoanLimitsByUser(List.of(user))).thenReturn(List.of());
+        when(loanLimitRepository.findLoanLimitsByUsers(List.of(user))).thenReturn(List.of());
 
         ArgumentCaptor<LoanLimit> loanLimitCaptor = ArgumentCaptor.forClass(LoanLimit.class);
         ArgumentCaptor<LoanLimitHistory> historyCaptor = ArgumentCaptor.forClass(LoanLimitHistory.class);

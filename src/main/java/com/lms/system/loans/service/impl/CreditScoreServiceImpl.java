@@ -1,7 +1,10 @@
 package com.lms.system.loans.service.impl;
 
+import com.lms.generic.audit.AuditAwareImpl;
 import com.lms.generic.dateRange.model.DateRangeFilter;
 import com.lms.generic.dateRange.service.DateFilterRangeService;
+import com.lms.generic.exception.BadRequestException;
+import com.lms.generic.localization.ILocalizationService;
 import com.lms.system.customer.account.enums.TransactionType;
 import com.lms.system.customer.account.model.Account;
 import com.lms.system.customer.account.model.Transaction;
@@ -9,6 +12,7 @@ import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.account.repository.TransactionRepository;
 import com.lms.system.customer.user.model.User;
 import com.lms.system.customer.user.repository.UserRepository;
+import com.lms.system.loans.dto.CreditScoreDTO;
 import com.lms.system.loans.enums.LoanStatus;
 import com.lms.system.loans.model.CreditScore;
 import com.lms.system.loans.model.CreditScoreHistory;
@@ -24,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +57,11 @@ public class CreditScoreServiceImpl implements ICreditScoreService {
     private final CreditScoreRepository creditScoreRepository;
 
     private final CreditScoreHistoryRepository creditScoreHistoryRepository;
+
+    private final AuditAwareImpl auditAware;
+
+    private final ILocalizationService localizationService;
+
 
 
     @Override
@@ -146,6 +157,45 @@ public class CreditScoreServiceImpl implements ICreditScoreService {
             log.debug("Deposits: {}, Txns: {}, On-time: {}, Late: {}", monthlyDeposits, transactionCount, onTime, late);
         }
     }
+
+    @Override
+    public CreditScoreDTO getUserCreditScore() {
+        User currentUser = auditAware.getCurrentLoggedInUser();
+        CreditScore creditScore = creditScoreRepository.findCreditScoreByUser(currentUser);
+
+        if (creditScore == null) {
+            return new CreditScoreDTO();
+        }
+
+        CreditScoreDTO creditScoreDTO = new CreditScoreDTO();
+        creditScoreDTO.setId(creditScore.getId());
+        creditScoreDTO.setScore(creditScore.getScore());
+
+        return creditScoreDTO;
+    }
+
+
+    @Override
+    public List<CreditScoreDTO> getCreditScoreHistory(Long id) {
+        if (id == null) {
+            throw new BadRequestException(localizationService.getMessage("message.missing.validDetails", null));
+        }
+
+        List<CreditScoreHistory> histories = creditScoreHistoryRepository.findByCreditScoreId(id);
+        if (histories == null || histories.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return histories.stream()
+                .map(history -> {
+                    CreditScoreDTO scoreDTO = new CreditScoreDTO();
+                    scoreDTO.setId(history.getId());
+                    scoreDTO.setScore(history.getScore());
+                    return scoreDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
 }
