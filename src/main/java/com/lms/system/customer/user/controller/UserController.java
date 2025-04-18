@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = "/customer", produces = MediaType.APPLICATION_JSON_VALUE)
 @Validated
-@Tag(name = "APIs for user Registration",
+@Tag(name = "APIs for Customer Registration",
         description = " ")
 @RequiredArgsConstructor
 @Slf4j

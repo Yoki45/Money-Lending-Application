@@ -37,7 +37,6 @@ public class LoanInstallment extends BaseEntity {
     @Column(name = "extension_date")
     private Date extensionDate;
 
-
     @Column(name = "payment_status")
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
