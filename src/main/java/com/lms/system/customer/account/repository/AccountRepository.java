@@ -24,4 +24,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAccountByCustomers(List<User> users);
 
 
+    @Query("SELECT u.customer FROM Account  u WHERE  u.accountNumber IN :accountNumber")
+    User findCustomerByAccountNumber(Long accountNumber);
+
+
 }

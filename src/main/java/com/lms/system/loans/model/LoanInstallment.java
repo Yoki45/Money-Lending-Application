@@ -29,7 +29,7 @@ public class LoanInstallment extends BaseEntity {
     private Integer installmentNumber;
 
     @Column(name = "amount", nullable = false)
-    private Integer amount;
+    private Double amount;
 
     @Column(name = "due_date", nullable = false)
     private Date dueDate;
