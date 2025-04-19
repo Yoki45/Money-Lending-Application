@@ -92,13 +92,102 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
 
     @Override
     public List<Loan> findLoanByStatus(LoanStatus status) {
-        if (status == null ) return new ArrayList<>();
+        if (status == null) return new ArrayList<>();
 
         Query query = em.createQuery("select l from Loan l where l.status = :status  ");
         query.setParameter("status", status);
 
         return query.getResultList();
 
+    }
+
+    @Override
+    public List<Loan> getLoans(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber) {
+
+        StringBuilder stringBuilder = new StringBuilder(" SELECT l from Loan l where 1=1 ");
+
+        getLoansQuery(status, loanId, startDate, endDate, customer, product, accountNumber, stringBuilder);
+
+        Query query = em.createQuery(stringBuilder.toString());
+
+        setLoanParameters(status, loanId, startDate, endDate, customer, product, accountNumber, query);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Loan> findLoanByAccountNumberAndStatus(Long accountNumber, List<LoanStatus> statuses) {
+        if (accountNumber == null ) return new ArrayList<>();
+
+        if (statuses.isEmpty()) statuses = Arrays.asList(LoanStatus.OVERDUE);
+
+        Query query = em.createQuery("select l from Loan l where l.account.accountNumber = :account AND l.status in :statuses");
+        query.setParameter("account", accountNumber);
+        query.setParameter("statuses", statuses);
+
+        return query.getResultList();
+
+    }
+
+    private void getLoansQuery(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, StringBuilder stringBuilder) {
+        if (status != null) {
+            stringBuilder.append(" and l.status = :status ");
+        }
+
+        if (loanId != null) {
+            stringBuilder.append(" and l.id = :loanId ");
+        }
+
+        if (startDate != null) {
+            stringBuilder.append(" and l.createdOn >= :startDate ");
+        }
+
+        if (endDate != null) {
+            stringBuilder.append(" and l.createdOn <= :endDate ");
+        }
+
+        if (customer != null) {
+            stringBuilder.append(" and l.account.customer.id  = :customer ");
+        }
+
+        if (product != null) {
+            stringBuilder.append(" and l.product.id = :product ");
+        }
+
+        if (accountNumber != null) {
+            stringBuilder.append(" and l.account.accountNumber = :accountNumber ");
+        }
+    }
+
+    private void setLoanParameters(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, Query query) {
+
+        if (loanId != null) {
+            query.setParameter("loanId", loanId);
+        }
+
+        if (startDate != null) {
+            query.setParameter("startDate", startDate);
+        }
+
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+
+        if (customer != null) {
+            query.setParameter("customer", customer);
+        }
+
+        if (product != null) {
+            query.setParameter("product", product);
+        }
+
+        if (accountNumber != null) {
+            query.setParameter("accountNumber", accountNumber);
+        }
+
+        if (status != null) {
+            query.setParameter("status", status);
+        }
     }
 
 

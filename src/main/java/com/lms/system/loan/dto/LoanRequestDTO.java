@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,6 +29,8 @@ public class LoanRequestDTO {
     @Schema(description = "Optional loan reference for tracking the application", example = "LOAN-REQ-9832")
     private String reference;
 
+    @Schema(description = "Optional consolidated due date", example = "LOAN-REQ-9832")
+    private Long ConsolidateDueDate;
 
 
 }

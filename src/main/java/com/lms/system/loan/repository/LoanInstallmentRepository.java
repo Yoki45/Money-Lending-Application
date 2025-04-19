@@ -26,4 +26,7 @@ public interface LoanInstallmentRepository extends JpaRepository<LoanInstallment
     @Query("SELECT il FROM LoanInstallment il WHERE il.loan IN :loan AND il.paymentStatus = :status ORDER BY il.dueDate asc ")
     List<LoanInstallment> findLoanInstallmentByLoansAndStatus(List<Loan> loan, PaymentStatus status);
 
+    @Query("SELECT il FROM LoanInstallment il WHERE il.loan IN :loan ORDER BY il.dueDate asc ")
+    List<LoanInstallment> findLoanInstallmentByLoans(List<Loan> loan);
+
 }

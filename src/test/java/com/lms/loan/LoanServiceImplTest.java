@@ -4,17 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lms.generic.exception.BadRequestException;
 import com.lms.generic.exception.NotFoundException;
 import com.lms.generic.localization.ILocalizationService;
+import com.lms.system.customer.account.model.Account;
 import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.user.model.User;
 import com.lms.system.loan.dto.LoanRequestDTO;
 import com.lms.system.loan.enums.LoanRiskCategory;
+import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.PaymentStatus;
 import com.lms.system.loan.model.Loan;
+import com.lms.system.loan.model.LoanInstallment;
 import com.lms.system.loan.model.LoanLimit;
+import com.lms.system.loan.repository.LoanInstallmentRepository;
 import com.lms.system.loan.repository.LoanLimitRepository;
 import com.lms.system.loan.repository.LoanRepository;
 import com.lms.system.loan.service.impl.LoanServiceImpl;
+import com.lms.system.notification.messaging.africastalking.service.AfricasTalkingGateway;
+import com.lms.system.product.enums.FeeType;
 import com.lms.system.product.enums.TenureType;
 import com.lms.system.product.model.Product;
+import com.lms.system.product.model.ProductFee;
 import com.lms.system.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +35,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,8 +70,14 @@ public class LoanServiceImplTest {
     @Mock
     private ILocalizationService localizationService;
 
+    @Mock
+    private AfricasTalkingGateway africasTalkingGateway;
+
     @InjectMocks
     private LoanServiceImpl loanService;
+
+    @Mock
+    private LoanInstallmentRepository loanInstallmentRepository;
 
     private LoanRequestDTO validRequest;
     private Product product;
@@ -149,5 +164,105 @@ public class LoanServiceImplTest {
         when(localizationService.getMessage("message.loans.exceededLoanLimit", null)).thenReturn("Limit exceeded");
 
         assertThrows(BadRequestException.class, () -> loanService.requestForLoan(validRequest));
+    }
+
+    @Test
+    void sweepOverdueLoans_shouldMarkLoansAndInstallmentsOverdue() {
+        Loan loan = new Loan();
+        loan.setId(1L);
+        loan.setStatus(LoanStatus.OPEN);
+        loan.setDueDate(new Date(System.currentTimeMillis() - 86400000)); // yesterday
+        loan.setBalance(500.0);
+
+        LoanInstallment installment = new LoanInstallment();
+        installment.setLoan(loan);
+        installment.setDueDate(new Date(System.currentTimeMillis() - 86400000));
+        installment.setPaymentStatus(PaymentStatus.NOT_PAID);
+
+        when(loanRepository.findLoanByStatusAndDate(eq(LoanStatus.OPEN), any()))
+                .thenReturn(List.of(loan));
+        when(loanInstallmentRepository.findLoanInstallmentByLoansAndStatus(any(), eq(PaymentStatus.NOT_PAID)))
+                .thenReturn(List.of(installment));
+
+        loanService.sweepOverdueLoans();
+
+        assertEquals(LoanStatus.OVERDUE, loan.getStatus());
+        assertEquals(LoanStatus.OVERDUE, installment.getStatus());
+        verify(loanRepository).save(loan);
+        verify(loanInstallmentRepository).save(installment);
+    }
+
+    @Test
+    void applyLateFeesToOverdueLoans_shouldApplyFeesCorrectly() {
+        ProductFee lateFee = ProductFee.builder()
+                .feeType(FeeType.LATE)
+                .amount(5.0)
+                .isPercentage(false)
+                .triggerDaysAfterDue(1)
+                .build();
+
+        Product product = Product.builder().fees(List.of(lateFee)).build();
+
+        Loan loan = new Loan();
+        loan.setProduct(product);
+        loan.setDueDate(new Date(System.currentTimeMillis() - 86400000 * 3));
+        loan.setBalance(100.0);
+        loan.setStatus(LoanStatus.OVERDUE);
+
+        when(loanRepository.findLoanByStatus(LoanStatus.OVERDUE)).thenReturn(List.of(loan));
+
+        loanService.applyLateFeesToOvedueLoans();
+
+        assertEquals(105.0, loan.getBalance());
+        verify(loanRepository).save(loan);
+    }
+
+    @Test
+    void consolidateLoanDueDates_shouldUpdateInstallments() {
+        Loan loan = new Loan();
+        loan.setId(1L);
+        loan.setStatus(LoanStatus.OPEN);
+        loan.setDueDate(new Date());
+
+        LoanInstallment installment1 = new LoanInstallment();
+        installment1.setDueDate(new Date());
+        installment1.setPaymentStatus(PaymentStatus.NOT_PAID);
+
+        LoanInstallment installment2 = new LoanInstallment();
+        installment2.setDueDate(new Date());
+        installment2.setPaymentStatus(PaymentStatus.NOT_PAID);
+
+        Product product = Product.builder().name("Test").id(1L).build();
+        loan.setProduct(product);
+
+        when(loanRepository.findLoanByAccountNumberAndStatus(anyLong(), any()))
+                .thenReturn(List.of(loan));
+        when(loanInstallmentRepository.findLoanInstallmentByLoans(any()))
+                .thenReturn(List.of(installment1, installment2));
+        when(localizationService.getMessage(any(), isNull())).thenReturn("Consolidation successful.");
+
+        LoanRequestDTO requestDTO = new LoanRequestDTO();
+        requestDTO.setAccountNumber(123456L);
+        requestDTO.setConsolidateDueDate(new Date().getTime());
+
+        String result = loanService.consolidateLoanDueDates(requestDTO);
+        assertEquals("Consolidation successful.", result);
+    }
+
+    @Test
+    void sendDueDateReminders_shouldSendSmsToOpenLoans() {
+        Loan loan = new Loan();
+        loan.setStatus(LoanStatus.OPEN);
+        loan.setBalance(100.0);
+        User user = new User();
+        Account account = new Account();
+        account.setCustomer(user);
+        loan.setAccount(account);
+
+        when(loanRepository.findLoanByStatusAndDate(eq(LoanStatus.OPEN), any()))
+                .thenReturn(List.of(loan));
+
+        loanService.sendDueDateReminders();
+        verify(africasTalkingGateway).sentReminderMessages(List.of(user));
     }
 }

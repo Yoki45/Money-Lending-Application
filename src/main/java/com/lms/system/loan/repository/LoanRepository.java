@@ -22,4 +22,9 @@ public interface LoanRepository extends GenericRepository<Loan, Long> {
     List<Loan> findLoanByStatusAndDate(LoanStatus status, Date loanDate);
 
     List<Loan> findLoanByStatus(LoanStatus status);
+
+    List<Loan> getLoans(LoanStatus status, Long loanId,Date startDate, Date endDate, Long customer,Long product,Long accountNumber);
+
+    List<Loan> findLoanByAccountNumberAndStatus(Long accountNumber, List<LoanStatus> statuses);
+
 }
