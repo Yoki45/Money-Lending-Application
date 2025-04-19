@@ -8,4 +8,6 @@ public interface IUserService {
     UserDTO login(LoginDTO loginDTO);
 
     String createUser(UserDTO userDTO);
+
+    String updateUser(Long userId, UserDTO userDTO);
 }

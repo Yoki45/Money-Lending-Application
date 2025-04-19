@@ -1,6 +1,7 @@
 package com.lms.system.customer.user.service.impl;
 
 import com.lms.generic.exception.BadRequestException;
+import com.lms.generic.exception.NotFoundException;
 import com.lms.generic.localization.ILocalizationService;
 import com.lms.security.model.CustomUserDetails;
 import com.lms.security.service.JwtService;
@@ -101,6 +102,35 @@ public class UserServiceImpl implements IUserService {
         currentUserDTO.setRefreshToken(refreshToken);
         return currentUserDTO;
     }
+
+
+   @Override
+    public String updateUser(Long userId, UserDTO userDTO) {
+
+        if (userId == null || userDTO == null) {
+            throw new BadRequestException(localizationService.getMessage("message.missing.validDetails", null));
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(localizationService.getMessage("message.user.notFound", null)));
+
+        if (userDTO.getName() != null) {
+            user.setName(userDTO.getName());
+        }
+
+        if (userDTO.getPhoneNumber() != null) {
+            user.setPhone(userDTO.getPhoneNumber());
+        }
+
+        if(userDTO.getCommunicationType() != null){
+            user.setCommunicationType(userDTO.getCommunicationType());
+        }
+
+        userRepository.save(user);
+
+        return localizationService.getMessage("message.user.userUpdated.success", null);
+    }
+
 }
 
 

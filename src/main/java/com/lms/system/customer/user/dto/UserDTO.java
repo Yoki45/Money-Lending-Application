@@ -1,6 +1,7 @@
 package com.lms.system.customer.user.dto;
 
 import com.lms.system.customer.account.dto.AccountsDTO;
+import com.lms.system.customer.user.enums.CommunicationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,5 +34,8 @@ public class UserDTO {
 
     @Schema(description = "Account details of the customer")
     private AccountsDTO accountDetails;
+
+    @Schema(description = "Preferred chanel of communication")
+    private CommunicationType communicationType;
 
 }

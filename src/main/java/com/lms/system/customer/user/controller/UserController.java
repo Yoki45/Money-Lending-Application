@@ -50,8 +50,26 @@ public class UserController {
     }
 
 
+    @Operation(summary = "update user details")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "HTTP Status OK"),
+            @ApiResponse(responseCode = "500", description = "HTTP Status Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)
+                    )
+            )
+    }
+    )
+    @PutMapping()
+    public ResponseEntity<ResponseDTO> updateProduct(@RequestParam Long userId, @Valid @RequestBody UserDTO userDTO) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new ResponseDTO(Utils.STATUS_200, userService.updateUser(userId, userDTO)));
+
+    }
+
+
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDTO login(@Valid @RequestBody LoginDTO loginRequestDTO){
+    public UserDTO login(@Valid @RequestBody LoginDTO loginRequestDTO) {
         return userService.login(loginRequestDTO);
     }
 

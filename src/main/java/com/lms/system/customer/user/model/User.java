@@ -2,6 +2,8 @@ package com.lms.system.customer.user.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lms.system.customer.account.model.Account;
+import com.lms.system.customer.user.enums.CommunicationType;
+import com.lms.system.product.enums.TenureType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +36,10 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     @JsonManagedReference  // Maintains the forward reference
     private Set<Role> roles;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "communication_chanel")
+    private CommunicationType communicationType;
 
 
 
