@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -20,5 +21,9 @@ public interface LoanInstallmentRepository extends JpaRepository<LoanInstallment
 
     @Query("SELECT COUNT(il) FROM LoanInstallment il WHERE il.loan.id = :loanId AND il.paymentStatus = :status")
     long countUnpaidInstallmentsByLoanId(@Param("loanId") Long loanId, PaymentStatus status);
+
+
+    @Query("SELECT il FROM LoanInstallment il WHERE il.loan IN :loan AND il.paymentStatus = :status ORDER BY il.dueDate asc ")
+    List<LoanInstallment> findLoanInstallmentByLoansAndStatus(List<Loan> loan, PaymentStatus status);
 
 }

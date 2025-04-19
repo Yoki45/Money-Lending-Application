@@ -150,6 +150,7 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
                     .amount(installmentAmount)
                     .balance(installmentAmount)
                     .dueDate(Date.valueOf(dueDate))
+                    .status(LoanStatus.OPEN)
                     .paymentStatus(PaymentStatus.NOT_PAID)
                     .build();
 

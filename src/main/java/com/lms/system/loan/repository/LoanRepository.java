@@ -5,6 +5,7 @@ import com.lms.system.customer.account.model.Account;
 import com.lms.system.loan.enums.LoanStatus;
 import com.lms.system.loan.model.Loan;
 
+import java.util.Date;
 import java.util.List;
 
 public interface LoanRepository extends GenericRepository<Loan, Long> {
@@ -17,4 +18,8 @@ public interface LoanRepository extends GenericRepository<Loan, Long> {
     Double totalLoansByAccountNumber(Long accountNumber, List<LoanStatus> statuses);
 
     Loan findLoanByLoanId(Long loanId);
+
+    List<Loan> findLoanByStatusAndDate(LoanStatus status, Date loanDate);
+
+    List<Loan> findLoanByStatus(LoanStatus status);
 }

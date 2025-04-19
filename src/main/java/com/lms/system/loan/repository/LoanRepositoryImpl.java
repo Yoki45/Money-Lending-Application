@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -74,6 +75,30 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
         query.setParameter("loanId", loanId);
 
         return (Loan) query.getSingleResult();
+    }
+
+    @Override
+    public List<Loan> findLoanByStatusAndDate(LoanStatus status, Date loanDate) {
+
+        if (status == null || loanDate == null) return new ArrayList<>();
+
+
+        Query query = em.createQuery("select l from Loan l where l.status = :status and l.dueDate < :loanDate ");
+        query.setParameter("status", status);
+        query.setParameter("loanDate", loanDate);
+
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Loan> findLoanByStatus(LoanStatus status) {
+        if (status == null ) return new ArrayList<>();
+
+        Query query = em.createQuery("select l from Loan l where l.status = :status  ");
+        query.setParameter("status", status);
+
+        return query.getResultList();
+
     }
 
 

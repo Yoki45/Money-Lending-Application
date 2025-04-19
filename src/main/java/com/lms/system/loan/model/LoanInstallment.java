@@ -1,8 +1,10 @@
 package com.lms.system.loan.model;
 
 import com.lms.generic.model.BaseEntity;
+import com.lms.system.loan.enums.LoanStatus;
 import com.lms.system.loan.enums.PaymentStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Date;
@@ -43,5 +45,9 @@ public class LoanInstallment extends BaseEntity {
     @Column(name = "payment_status")
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "loan_status")
+    private LoanStatus status;
 
 }

@@ -8,12 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,4 +80,34 @@ public class AfricasTalkingGateway {
         return new SmsResponseDto();
     }
 
+    @Async
+    public void sendMultiple(List<MessageDto> messageDtos, User toUser) {
+        if (messageDtos == null || messageDtos.isEmpty()) {
+            return;
+        }
+
+        messageDtos.forEach(message -> {
+            sendSMS(message, toUser);
+        });
+    }
+
+
+    public void sentReminderMessages(List<User> customers) {
+        List<MessageDto> reminderMessages = new ArrayList<>();
+        customers = customers.stream().distinct().collect(Collectors.toList());
+        for (User user : customers) {
+            MessageDto message = new MessageDto();
+            message.setTo(user.getPhone());
+            message.setMessage("Friendly Reminder: Your loan repayment is one week due . Please ensure timely payment to avoid any delays or penalties. Thank you!");
+            reminderMessages.add(message);
+        }
+
+        this.sendMultiple(reminderMessages, null);
+        log.info("Sent reminder messages: {}", reminderMessages.size());
+
+    }
+
+
 }
+
+
