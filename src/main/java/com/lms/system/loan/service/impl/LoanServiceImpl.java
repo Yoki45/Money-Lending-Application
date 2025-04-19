@@ -19,6 +19,7 @@ import com.lms.system.loan.dto.LoanRequestDTO;
 import com.lms.system.loan.dto.LoanResponseDTO;
 import com.lms.system.loan.enums.LoanRiskCategory;
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 import com.lms.system.loan.enums.PaymentStatus;
 import com.lms.system.loan.model.Loan;
 import com.lms.system.loan.model.LoanInstallment;
@@ -212,7 +213,7 @@ public class LoanServiceImpl implements ILoanService {
     }
 
     @Override
-    public LoanReportDTO fetchLoanDetails(LoanStatus status, Long loanId, String range, Long customerId, Long productId, Long accountNumber, Integer page) {
+    public LoanReportDTO fetchLoanDetails(LoanStatus status, Long loanId, String range, Long customerId, Long productId, Long accountNumber, Integer page, LoanType loanType) {
 
         int currentPage = Optional.ofNullable(page).orElse(1);
         String dateRange = Optional.ofNullable(range).orElse("this_week");
@@ -220,7 +221,7 @@ public class LoanServiceImpl implements ILoanService {
         DateRangeFilter dateRangeFilter = dateFilterRangeService.getFilterDateRange(dateRange);
 
         List<Loan> loans = loanRepository.getLoans(status, loanId, dateRangeFilter.getBeginCalendar().getTime(),
-                dateRangeFilter.getEndCalendar().getTime(), customerId, productId, accountNumber);
+                dateRangeFilter.getEndCalendar().getTime(), customerId, productId, accountNumber, loanType);
 
         List<List<Loan>> pagedLoans = Utils.createSubList(loans, Utils.MAX_PAGE_SIZE);
         if (pagedLoans.isEmpty()) {
@@ -268,7 +269,6 @@ public class LoanServiceImpl implements ILoanService {
                 .toLocalDate();
 
 
-
         List<Loan> activeLoans = loanRepository.findLoanByAccountNumberAndStatus(accountNumber, Arrays.asList(LoanStatus.OPEN));
         if (activeLoans.isEmpty()) {
             return localizationService.getMessage("message.loan.noActiveFound", null);
@@ -295,9 +295,11 @@ public class LoanServiceImpl implements ILoanService {
 
                 // Set loan's due date to the last updated installment due date
                 loan.setDueDate(unpaidInstallments.get(unpaidInstallments.size() - 1).getDueDate());
+                loan.setLoanType(LoanType.CONSOLIDATED);
             } else {
                 // If no installments, use base consolidated start date as due date
                 loan.setDueDate(Date.from(consolidatedStartDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                loan.setLoanType(LoanType.CONSOLIDATED);
             }
 
             loanRepository.save(loan);
@@ -328,6 +330,8 @@ public class LoanServiceImpl implements ILoanService {
         responseDTO.setDueDate(loan.getDueDate());
         responseDTO.setStatus(loan.getStatus());
         responseDTO.setInstallments(installmentDTOs);
+        responseDTO.setLoanType(loan.getLoanType() != null ? loan.getLoanType() : LoanType.DEFAULT);
+
 
         return responseDTO;
     }

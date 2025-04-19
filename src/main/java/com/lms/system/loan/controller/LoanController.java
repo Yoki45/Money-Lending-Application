@@ -8,6 +8,7 @@ import com.lms.system.loan.dto.LoanLimitDTO;
 import com.lms.system.loan.dto.LoanReportDTO;
 import com.lms.system.loan.dto.LoanRequestDTO;
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 import com.lms.system.loan.model.Loan;
 import com.lms.system.loan.service.ILoanService;
 import com.lms.utils.Utils;
@@ -144,10 +145,10 @@ public class LoanController {
     public ResponseEntity<LoanReportDTO> fetchLoanDetails(@RequestParam(required = false) LoanStatus status,
                                                           @RequestParam(required = false) Long loan, @RequestParam(required = false) String range,
                                                           @RequestParam(required = false) Long customer, @RequestParam(required = false) Long product, @RequestParam(required = false) Long accountNumber,
-                                                          @RequestParam(required = false) Integer page) {
+                                                          @RequestParam(required = false) Integer page, @RequestParam(required = false) LoanType type) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(loanService.fetchLoanDetails(status, loan, range, customer, product, accountNumber, page));
+                .body(loanService.fetchLoanDetails(status, loan, range, customer, product, accountNumber, page, type));
 
     }
 

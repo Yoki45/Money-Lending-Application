@@ -3,6 +3,7 @@ package com.lms.system.loan.repository;
 import com.lms.generic.repository.GenericRepositoryImpl;
 import com.lms.system.customer.account.model.Account;
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 import com.lms.system.loan.model.Loan;
 import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
@@ -102,15 +103,15 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
     }
 
     @Override
-    public List<Loan> getLoans(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber) {
+    public List<Loan> getLoans(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, LoanType loanType) {
 
         StringBuilder stringBuilder = new StringBuilder(" SELECT l from Loan l where 1=1 ");
 
-        getLoansQuery(status, loanId, startDate, endDate, customer, product, accountNumber, stringBuilder);
+        getLoansQuery(status, loanId, startDate, endDate, customer, product, accountNumber, stringBuilder,loanType);
 
         Query query = em.createQuery(stringBuilder.toString());
 
-        setLoanParameters(status, loanId, startDate, endDate, customer, product, accountNumber, query);
+        setLoanParameters(status, loanId, startDate, endDate, customer, product, accountNumber, query,loanType);
 
         return query.getResultList();
     }
@@ -129,7 +130,7 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
 
     }
 
-    private void getLoansQuery(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, StringBuilder stringBuilder) {
+    private void getLoansQuery(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, StringBuilder stringBuilder,LoanType type) {
         if (status != null) {
             stringBuilder.append(" and l.status = :status ");
         }
@@ -157,9 +158,15 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
         if (accountNumber != null) {
             stringBuilder.append(" and l.account.accountNumber = :accountNumber ");
         }
+
+        if(type != null){
+            stringBuilder.append(" and l.loanType = :loanType ");
+
+
+        }
     }
 
-    private void setLoanParameters(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, Query query) {
+    private void setLoanParameters(LoanStatus status, Long loanId, Date startDate, Date endDate, Long customer, Long product, Long accountNumber, Query query,LoanType loanType) {
 
         if (loanId != null) {
             query.setParameter("loanId", loanId);
@@ -187,6 +194,10 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
 
         if (status != null) {
             query.setParameter("status", status);
+        }
+
+        if(loanType != null){
+            query.setParameter("loanType",loanType);
         }
     }
 

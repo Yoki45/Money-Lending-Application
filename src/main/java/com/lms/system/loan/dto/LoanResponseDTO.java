@@ -1,6 +1,7 @@
 package com.lms.system.loan.dto;
 
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 import com.lms.system.loan.model.LoanInstallment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -36,6 +37,9 @@ public class LoanResponseDTO {
 
     @Schema(description = "List of loan installments for this loan")
     private List<LoanInstallmentDTO> installments;
+
+    @Schema(description = "Loan Type ", example = "OPEN")
+    private LoanType loanType;
 
 
 }

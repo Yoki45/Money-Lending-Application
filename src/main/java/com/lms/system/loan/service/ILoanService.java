@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.lms.system.loan.dto.LoanReportDTO;
 import com.lms.system.loan.dto.LoanRequestDTO;
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 
 import java.util.Date;
 
@@ -17,7 +18,7 @@ public interface ILoanService {
 
     void sendDueDateReminders();
 
-    LoanReportDTO fetchLoanDetails(LoanStatus status, Long loanId, String range, Long customer, Long product, Long accountNumber,Integer page);
+    LoanReportDTO fetchLoanDetails(LoanStatus status, Long loanId, String range, Long customer, Long product, Long accountNumber, Integer page, LoanType loanType);
 
     String consolidateLoanDueDates(LoanRequestDTO loanRequestDTO);
 

@@ -8,6 +8,7 @@ import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.user.model.User;
 import com.lms.system.loan.dto.LoanRequestDTO;
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 import com.lms.system.loan.enums.PaymentStatus;
 import com.lms.system.loan.model.CreditScore;
 import com.lms.system.loan.model.Loan;
@@ -102,6 +103,7 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
                     .dueDate(Date.valueOf(firstDueDate))
                     .status(LoanStatus.OPEN)
                     .product(product)
+                    .loanType(LoanType.DEFAULT)
                     .build();
 
            loan = loanRepository.save(loan);

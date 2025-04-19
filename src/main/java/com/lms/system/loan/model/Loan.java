@@ -3,6 +3,7 @@ package com.lms.system.loan.model;
 import com.lms.generic.model.BaseEntity;
 import com.lms.system.customer.account.model.Account;
 import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.enums.LoanType;
 import com.lms.system.product.model.Product;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -51,5 +52,8 @@ public class Loan extends BaseEntity {
     @JoinColumn(name = "product", referencedColumnName = "id", nullable = false)
     @ManyToOne(cascade = CascadeType.ALL)
     private Product product;
+
+    @Enumerated(EnumType.STRING)
+    private LoanType loanType = LoanType.DEFAULT;
 
 }
