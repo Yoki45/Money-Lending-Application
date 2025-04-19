@@ -8,14 +8,16 @@ import java.time.LocalDate;
 
 public interface IEmailService {
 
-    void sendEmail(String emailAddress, String subject,String message);
+    void sendEmail(String emailAddress, String subject, String message);
 
     void sendLoanApprovalEmail(LoanRequestDTO request, User user, LocalDate firstDueDate);
 
     void sendEmailRejectionDueToLowCreditScore(User user, CreditScore creditScore);
 
-}
+    void sendEmailIssueResolved(User user, String issueTitle);
 
+
+}
 
 
 
