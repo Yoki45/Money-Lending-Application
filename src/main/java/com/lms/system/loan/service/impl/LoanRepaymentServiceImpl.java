@@ -44,13 +44,18 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
         Loan loan = getLoanAndValidateStatus(loanRepaymentDTO.getLoanId());
 
         double remainingAmount = loanRepaymentDTO.getAmount();
-        remainingAmount = processInstallmentPayments(loan, remainingAmount);
 
-        if (remainingAmount > 0) {
+        List<LoanInstallment> installments = loanInstallmentRepository.findLoanInstallmentByLoanAndStatus(
+                loan, PaymentStatus.NOT_PAID);
+
+        if (!installments.isEmpty()) {
+            processInstallmentPayments(loan, remainingAmount,installments);
+
+        } else {
             processLoanBalance(loan, remainingAmount);
+
         }
 
-        checkAndUpdateLoanStatus(loan);
         loanRepository.save(loan);
 
         return localizationService.getMessage("message.200.ok", null);
@@ -92,13 +97,10 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
         return loan;
     }
 
-    private double processInstallmentPayments(Loan loan, double remainingAmount) {
+    private double processInstallmentPayments(Loan loan, double remainingAmount,List<LoanInstallment> installments) {
         if (remainingAmount <= 0) {
             return remainingAmount;
         }
-
-        List<LoanInstallment> installments = loanInstallmentRepository.findLoanInstallmentByLoanAndStatus(
-                loan, PaymentStatus.NOT_PAID);
 
         for (LoanInstallment installment : installments) {
             if (remainingAmount <= 0) break;
@@ -109,9 +111,17 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
             updateInstallment(installment, balance, paymentAmount);
             createAndSaveRepaymentHistory(loan, paymentAmount);
 
+            Double newloanBalance = loan.getBalance() - paymentAmount;
+
+            loan.setBalance(newloanBalance);
+
+            loanRepository.save(loan);
+
             remainingAmount -= paymentAmount;
             loanInstallmentRepository.save(installment);
         }
+
+        checkAndUpdateLoanStatus(loan);
 
         return remainingAmount;
     }
@@ -150,7 +160,7 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
     }
 
     private void checkAndUpdateLoanStatus(Loan loan) {
-        if (loanInstallmentRepository.countUnpaidInstallmentsByLoanId(loan.getId()) == 0) {
+        if (loanInstallmentRepository.countUnpaidInstallmentsByLoanId(loan.getId(),PaymentStatus.NOT_PAID) == 0) {
             loan.setBalance(0.0);
             loan.setStatus(LoanStatus.CLOSED);
             loan.setRepaidDate(new Date());

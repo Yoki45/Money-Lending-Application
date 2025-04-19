@@ -18,7 +18,7 @@ public interface LoanInstallmentRepository extends JpaRepository<LoanInstallment
     @Query("SELECT il FROM LoanInstallment il WHERE il.loan = :loan AND il.paymentStatus = :status ORDER BY il.dueDate asc ")
     List<LoanInstallment> findLoanInstallmentByLoanAndStatus(Loan loan, PaymentStatus status);
 
-    @Query("SELECT COUNT(il) FROM LoanInstallment il WHERE il.loan.id = :loanId AND il.paymentStatus <> 'PAID'")
-    long countUnpaidInstallmentsByLoanId(@Param("loanId") Long loanId);
+    @Query("SELECT COUNT(il) FROM LoanInstallment il WHERE il.loan.id = :loanId AND il.paymentStatus = :status")
+    long countUnpaidInstallmentsByLoanId(@Param("loanId") Long loanId, PaymentStatus status);
 
 }

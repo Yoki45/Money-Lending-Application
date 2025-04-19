@@ -70,7 +70,7 @@ public class LoanRepositoryImpl extends GenericRepositoryImpl<Loan, Long> implem
             return null;
         }
 
-        Query query = em.createQuery("select SUM(COALESCE(l.amount, 0)) from Loan l where l.id = :loanId ");
+        Query query = em.createQuery("select l from Loan l where l.id = :loanId ");
         query.setParameter("loanId", loanId);
 
         return (Loan) query.getSingleResult();

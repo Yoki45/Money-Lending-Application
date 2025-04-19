@@ -75,7 +75,7 @@ public class LoanRepaymentServiceImplTest {
         when(loanRepository.findLoanByLoanId(1L)).thenReturn(loan);
         when(loanInstallmentRepository.findLoanInstallmentByLoanAndStatus(eq(loan), eq(PaymentStatus.NOT_PAID)))
                 .thenReturn(List.of(installment));
-        when(loanInstallmentRepository.countUnpaidInstallmentsByLoanId(loan.getId())).thenReturn(0L);
+        when(loanInstallmentRepository.countUnpaidInstallmentsByLoanId(loan.getId(),PaymentStatus.NOT_PAID)).thenReturn(0L);
         when(localizationService.getMessage(eq("message.200.ok"), any())).thenReturn("Success");
 
         String response = loanRepaymentService.repayLoan(dto);

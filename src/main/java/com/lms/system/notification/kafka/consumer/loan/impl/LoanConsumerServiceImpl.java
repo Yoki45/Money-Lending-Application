@@ -103,11 +103,14 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
                     .status(LoanStatus.OPEN)
                     .product(product)
                     .build();
-            loanRepository.save(loan);
 
-            List<LoanInstallment> installments = createInstallmentsForLoan(loan, product, request.getNumberOfInstallments());
-            loanInstallmentRepository.saveAll(installments);
+           loan = loanRepository.save(loan);
 
+            if (request.getNumberOfInstallments() > 1) {
+                List<LoanInstallment> installments = createInstallmentsForLoan(loan, product, request.getNumberOfInstallments());
+                loanInstallmentRepository.saveAll(installments);
+
+            }
 
             emailService.sendLoanApprovalEmail(request, user, firstDueDate);
 
@@ -115,7 +118,6 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
             log.error("Error processing loan for account {}: {}", request.getAccountNumber(), e.getMessage(), e);
         }
     }
-
 
 
     private LocalDate calculateDueDate(TenureType type, Integer value) {
