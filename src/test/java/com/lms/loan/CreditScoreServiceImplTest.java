@@ -16,10 +16,10 @@ import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.account.repository.TransactionRepository;
 import com.lms.system.customer.user.model.User;
 import com.lms.system.customer.user.repository.UserRepository;
-import com.lms.system.loans.enums.LoanStatus;
-import com.lms.system.loans.model.*;
-import com.lms.system.loans.repository.*;
-import com.lms.system.loans.service.impl.CreditScoreServiceImpl;
+import com.lms.system.loan.enums.LoanStatus;
+import com.lms.system.loan.model.*;
+import com.lms.system.loan.repository.*;
+import com.lms.system.loan.service.impl.CreditScoreServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -78,7 +78,7 @@ public class CreditScoreServiceImplTest {
         when(userRepository.findAll()).thenReturn(List.of(user));
         when(accountRepository.findAccountByCustomers(List.of(user))).thenReturn(List.of(account));
         when(loanRepository.findLoanByAccounts(List.of(account))).thenReturn(List.of(loan));
-        when(loanRepaymentRepository.findMonthlyRepaymentHistoryByLoans(List.of(loan)))
+        when(loanRepaymentRepository.findRepaymentHistoryByLoans(List.of(loan)))
                 .thenReturn(List.of(repaymentOnTime));
         when(transactionRepository.findMonthlyTransactions(eq(List.of(account)), any(), any()))
                 .thenReturn(List.of(transaction));

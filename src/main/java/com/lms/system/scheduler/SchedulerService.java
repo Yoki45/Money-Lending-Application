@@ -1,7 +1,7 @@
 package com.lms.system.scheduler;
 
-import com.lms.system.loans.service.ICreditScoreService;
-import com.lms.system.loans.service.ILoanLimitService;
+import com.lms.system.loan.service.ICreditScoreService;
+import com.lms.system.loan.service.ILoanLimitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
