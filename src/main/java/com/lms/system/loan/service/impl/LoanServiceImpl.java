@@ -39,8 +39,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -261,8 +263,10 @@ public class LoanServiceImpl implements ILoanService {
         }
 
         Long accountNumber = loanRequestDTO.getAccountNumber();
-        LocalDate consolidatedStartDate = new Date(loanRequestDTO.getConsolidateDueDate()).toInstant()
-                .atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate consolidatedStartDate = Instant.ofEpochMilli(loanRequestDTO.getConsolidateDueDate())
+                .atZone(ZoneOffset.UTC)
+                .toLocalDate();
+
 
 
         List<Loan> activeLoans = loanRepository.findLoanByAccountNumberAndStatus(accountNumber, Arrays.asList(LoanStatus.OPEN));
