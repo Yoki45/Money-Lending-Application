@@ -42,6 +42,7 @@ public class EmailServiceImpl implements IEmailService {
         }
     }
 
+    @Override
     public void sendEmailRejectionDueToLowCreditScore(User user, CreditScore creditScore) {
 
         String subject = " Loan Application Status: Rejected";
@@ -89,7 +90,7 @@ public class EmailServiceImpl implements IEmailService {
         this.sendEmail(user.getUsername(), subject, htmlBody);
     }
 
-
+    @Override
     public void sendLoanApprovalEmail(LoanRequestDTO request, User user, LocalDate firstDueDate) {
         String subject = " Loan Application Approved";
 
@@ -126,4 +127,34 @@ public class EmailServiceImpl implements IEmailService {
 
         this.sendEmail(user.getUsername(), subject, htmlBody);
     }
+
+    @Override
+    public void sendEmailIssueResolved(User user, String issueTitle) {
+        String subject = " Support Issue Resolved";
+
+        String htmlBody = """
+                <html>
+                  <body style="font-family: Arial, sans-serif; color: #333;">
+                    <p>Dear %s,</p>
+
+                    <p>
+                      We’re pleased to inform you that your issue titled <strong>"%s"</strong> has been successfully resolved.
+                    </p>
+
+                    <p>
+                      If you experience any further issues or need additional assistance, please don't hesitate to reach out to our support team.
+                    </p>
+
+                    <p>Thank you for using our services.</p>
+
+                    <p>Warm regards,<br/>
+                    <strong>Customer Support Team</strong><br/>
+                    LMS Service</p>
+                  </body>
+                </html>
+                """.formatted(user.getName(), issueTitle);
+
+        this.sendEmail(user.getUsername(), subject, htmlBody);
+    }
+
 }
