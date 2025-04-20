@@ -81,6 +81,7 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
 
             if (creditScore == null || creditScore.getScore() < MINIMUM_CREDIT_SCORE) {
                 emailService.sendEmailRejectionDueToLowCreditScore(user, creditScore);
+                log.info("loan request rejected due to low credit score : {}", creditScore);
                 return;
             }
 
@@ -111,6 +112,7 @@ public class LoanConsumerServiceImpl implements ILoanConsumerService {
             if (request.getNumberOfInstallments() > 1) {
                 List<LoanInstallment> installments = createInstallmentsForLoan(loan, product, request.getNumberOfInstallments());
                 loanInstallmentRepository.saveAll(installments);
+                log.info("installments : {}", installments);
 
             }
 

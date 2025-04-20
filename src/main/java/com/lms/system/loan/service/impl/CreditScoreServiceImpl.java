@@ -170,6 +170,8 @@ public class CreditScoreServiceImpl implements ICreditScoreService {
         creditScoreDTO.setId(creditScore.getId());
         creditScoreDTO.setScore(creditScore.getScore());
 
+        log.info("User [{}] - score: {}", currentUser.getUsername(), creditScoreDTO);
+
         return creditScoreDTO;
     }
 

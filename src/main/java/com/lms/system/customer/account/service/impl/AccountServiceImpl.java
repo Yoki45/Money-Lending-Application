@@ -17,6 +17,7 @@ import com.lms.system.customer.account.service.IAccountService;
 import com.lms.system.customer.user.model.User;
 import com.lms.utils.Utils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AccountServiceImpl implements IAccountService {
 
     private final AccountRepository accountRepository;
@@ -52,6 +54,8 @@ public class AccountServiceImpl implements IAccountService {
 
         accountRepository.save(newAccount);
 
+        log.info("New account created for customer {} with accountNumber {} ", user.getUsername(), randomAccNumber);
+
     }
 
     @Override
@@ -77,6 +81,8 @@ public class AccountServiceImpl implements IAccountService {
         account = accountRepository.save(account);
 
         createAndSaveTransaction(account, depositAmount, TransactionType.DEPOSIT);
+
+        log.info(" {} has been successfully deposited to account {}", depositAmount, account.getAccountNumber());
 
         return localizationService.getMessage("message.account.depositSuccess",
                 new Object[]{depositAmount, account.getAccountNumber()});
@@ -109,6 +115,9 @@ public class AccountServiceImpl implements IAccountService {
         accountRepository.save(account);
 
         createAndSaveTransaction(account, depositAmount, TransactionType.WITHDRAWAL);
+
+        log.info(" {} has been successfully withdrawn from account {}", depositAmount, account.getAccountNumber());
+
 
         return localizationService.getMessage("message.account.withdrawalSuccess",
                 new Object[]{depositAmount, account.getAccountNumber()});

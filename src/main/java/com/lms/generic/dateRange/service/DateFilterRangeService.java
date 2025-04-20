@@ -3,6 +3,7 @@ package com.lms.generic.dateRange.service;
 import com.lms.generic.dateRange.enums.RangeFilter;
 import com.lms.generic.dateRange.model.DateRangeFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -14,6 +15,7 @@ import static com.lms.utils.Utils.stringNullOrEmpty;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DateFilterRangeService {
 
 
@@ -73,6 +75,8 @@ public class DateFilterRangeService {
                 endCalendar = getEndOfWeek(LocalDate.now());
                 break;
         }
+
+        log.info("FilterDateRange: {}", rangeFilter);
 
         return new DateRangeFilter(beginCalendar, endCalendar, overdue);
     }

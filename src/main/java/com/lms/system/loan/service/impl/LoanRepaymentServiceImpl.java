@@ -54,14 +54,19 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
                 loan, PaymentStatus.NOT_PAID);
 
         if (!installments.isEmpty()) {
+            log.info("Repay loan {} with {} installments", loan.getId(), installments.size());
             processInstallmentPayments(loan, remainingAmount,installments);
 
         } else {
+            log.info("Repay loan {} without installments", loan.getId());
             processLoanBalance(loan, remainingAmount);
 
         }
 
         loanRepository.save(loan);
+
+        log.info("loan {} has successfully been repaid", loan.getId());
+
 
         return localizationService.getMessage("message.200.ok", null);
     }

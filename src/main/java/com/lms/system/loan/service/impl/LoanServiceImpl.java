@@ -7,10 +7,6 @@ import com.lms.generic.dateRange.service.DateFilterRangeService;
 import com.lms.generic.exception.BadRequestException;
 import com.lms.generic.exception.NotFoundException;
 import com.lms.generic.localization.ILocalizationService;
-import com.lms.system.customer.account.dto.TransactionReportDTO;
-import com.lms.system.customer.account.dto.TransactionsResponseDTO;
-import com.lms.system.customer.account.enums.TransactionType;
-import com.lms.system.customer.account.model.Transaction;
 import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.user.model.User;
 import com.lms.system.loan.dto.LoanInstallmentDTO;
@@ -128,12 +124,17 @@ public class LoanServiceImpl implements ILoanService {
             return;
         }
 
+        log.info("overdue sweep found for active loans {}", activeLoans.size());
+
         List<LoanInstallment> unpaidInstallments = loanInstallmentRepository.findLoanInstallmentByLoansAndStatus(activeLoans, PaymentStatus.NOT_PAID);
 
         if (unpaidInstallments.isEmpty()) {
             log.info("No unpaid installments to process.");
             return;
         }
+
+        log.info("unpaid installments to process {}", unpaidInstallments.size());
+
 
         Map<Loan, List<LoanInstallment>> installmentsByLoan = unpaidInstallments.stream()
                 .collect(Collectors.groupingBy(LoanInstallment::getLoan));
@@ -168,6 +169,8 @@ public class LoanServiceImpl implements ILoanService {
                 loanRepository.save(loan);
             }
         }
+
+        log.info("overdue sweep found for active loans {} complete", activeLoans.size());
     }
 
     @Override
@@ -304,6 +307,8 @@ public class LoanServiceImpl implements ILoanService {
 
             loanRepository.save(loan);
         }
+
+        log.info("consolidation complete for account {}",accountNumber);
 
         return localizationService.getMessage("message.loan.consolidated", null);
 

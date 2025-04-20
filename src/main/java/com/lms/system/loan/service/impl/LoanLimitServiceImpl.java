@@ -116,6 +116,8 @@ public class LoanLimitServiceImpl implements ILoanLimitService {
         limitDTO.setLimit(loanLimit.getLimit());
         limitDTO.setCategory(loanLimit.getCategory());
 
+        log.info("User [{}] - Limit: {}", currentUser.getUsername(), limitDTO);
+
         return limitDTO;
 
 
