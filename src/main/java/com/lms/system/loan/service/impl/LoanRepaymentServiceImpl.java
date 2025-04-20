@@ -132,6 +132,7 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
 
         if (newBalance == 0) {
             installment.setPaymentStatus(PaymentStatus.PAID);
+            installment.setStatus(LoanStatus.CLOSED);
         }
     }
 
