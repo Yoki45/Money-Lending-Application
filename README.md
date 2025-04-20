@@ -64,6 +64,9 @@ africas.username=yoki
 ```
 
 ### 3. Load SQL Scripts
+
+Create the schema/database manually in your MySQL or MariaDB instance (e.g., lending_application).
+
 Before running the app, execute SQL schema and seed files located under:
 ```
 /src/main/resources/sql/
