@@ -78,6 +78,26 @@ You’ll find a separate folder for each module (loan, product, notification, fe
 
 These initialize the database structure and populate basic sample data.
 
+To avoid foreign key constraint issues while running the scripts:
+
+```
+SET FOREIGN_KEY_CHECKS = 0;
+```
+
+Re-enable foreign key checks after completion:
+
+```
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+Ensure you set your MySQL configurations properly in your application.properties  file:
+
+```
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+```
+
+
 ### 4. Run Application
 ```bash
 mvn spring-boot:run
