@@ -12,6 +12,7 @@ A comprehensive Spring Boot-based lending application that handles loan creation
 - **Notification Module**: Sends event-based notifications via email or SMS.
 - **FeedBack Module**: Allows users to raise feedback, issues, or support requests.
 - **Scheduler Module**: Cron jobs for overdue checks, applying late fees, sending reminders.
+- **Localization Service**: Handles multilingual message support and dynamic message resolution across all modules to enhance user experience and maintain consistent error and success messaging
 
 ---
 
@@ -92,5 +93,14 @@ Once the system is running, visit the Swagger UI:
 ## 🔗 Project Repository
 
 [GitHub - Money Lending Application](https://github.com/Yoki45/Money-Lending-Application)
+
+
+📦 Sample User Credentials (For SQL Seeded Data)
+
+If you've chosen to run the SQL scripts for schema and seed data, you can use the following credentials to log in and explore the system:
+
+    Username: okiyostephen@gmail.com
+
+    Password: 12345678
 
 ---
