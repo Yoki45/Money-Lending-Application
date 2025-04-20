@@ -107,6 +107,9 @@ mvn spring-boot:run
 
 ## 🌐 API Documentation
 
+[https://documenter.getpostman.com/view/36148293/2sB2iwEEAF](https://documenter.getpostman.com/view/36148293/2sB2iwEEAF)
+
+
 Once the system is running, visit the Swagger UI:
 
 [http://localhost:8099/api/v1/lms/swagger-ui/index.html#/](http://localhost:8099/api/v1/lms/swagger-ui/index.html#/)
