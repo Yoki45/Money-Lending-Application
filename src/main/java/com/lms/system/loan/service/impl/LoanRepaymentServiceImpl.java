@@ -39,11 +39,16 @@ public class LoanRepaymentServiceImpl implements ILoanRepaymentService {
     @Override
     @Transactional
     public String repayLoan(LoanRepaymentDTO loanRepaymentDTO) {
+
         validateRepaymentRequest(loanRepaymentDTO);
 
         Loan loan = getLoanAndValidateStatus(loanRepaymentDTO.getLoanId());
 
         double remainingAmount = loanRepaymentDTO.getAmount();
+
+        if(remainingAmount > loan.getBalance()) {
+            throw new BadRequestException(localizationService.getMessage("message.loan.overpayment", null));
+        }
 
         List<LoanInstallment> installments = loanInstallmentRepository.findLoanInstallmentByLoanAndStatus(
                 loan, PaymentStatus.NOT_PAID);
