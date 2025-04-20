@@ -1,5 +1,6 @@
 package com.lms.system.notification.issuetracker.service.impl;
 
+import com.lms.generic.audit.AuditAwareImpl;
 import com.lms.generic.exception.BadRequestException;
 import com.lms.generic.exception.NotFoundException;
 import com.lms.generic.localization.ILocalizationService;
@@ -13,6 +14,7 @@ import com.lms.system.notification.messaging.email.service.IEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,6 +28,8 @@ public class FeedBackServiceImpl implements IFeedBackService {
 
     private final IEmailService emailService;
 
+    private final AuditAwareImpl auditAware;
+
 
     @Override
     public String submitFeedback(FeedBackRequestDTO requestDTO) {
@@ -38,6 +42,8 @@ public class FeedBackServiceImpl implements IFeedBackService {
                 .title(requestDTO.getTitle())
                 .type(requestDTO.getType())
                 .status(FeedBackStatus.OPEN)
+                .createdBy(auditAware.getCurrentLoggedInUser())
+                .createdOn(new Date())
                 .build();
 
          feedback = feedbackRepository.save(feedback);

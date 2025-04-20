@@ -49,7 +49,7 @@ public class Feedback  {
     @CreatedBy
     private User createdBy;
 
-    @Column(nullable = false,  updatable = false)
+    @Column(updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdOn;

@@ -1,5 +1,6 @@
 package com.lms.notification.issuetracking;
 
+import com.lms.generic.audit.AuditAwareImpl;
 import com.lms.generic.exception.BadRequestException;
 import com.lms.generic.exception.NotFoundException;
 import com.lms.generic.localization.ILocalizationService;
@@ -39,6 +40,9 @@ public class FeedBackServiceImplTest {
 
     @Mock
     private IEmailService emailService;
+
+    @Mock
+    private AuditAwareImpl auditAware;
 
     @BeforeEach
     void setUp() {
