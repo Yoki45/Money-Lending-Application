@@ -5,6 +5,10 @@ import com.lms.generic.exception.NotFoundException;
 import com.lms.generic.localization.ILocalizationService;
 import com.lms.security.model.CustomUserDetails;
 import com.lms.security.service.JwtService;
+import com.lms.system.customer.account.dto.AccountsDTO;
+import com.lms.system.customer.account.enums.AccountType;
+import com.lms.system.customer.account.model.Account;
+import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.account.service.IAccountService;
 import com.lms.system.customer.user.dto.UserDTO;
 import com.lms.system.customer.user.model.User;
@@ -36,6 +40,8 @@ public class UserServiceImpl implements IUserService {
 
     private final ILocalizationService localizationService;
 
+    private final AccountRepository accountRepository;
+
 
     @Override
     public UserDTO login(LoginDTO loginDTO) {
@@ -60,7 +66,10 @@ public class UserServiceImpl implements IUserService {
         CustomUserDetails customerUserDetails = new CustomUserDetails(user);
         String accessToken = jwtService.generateToken(customerUserDetails);
         String refreshToken = jwtService.generateRefreshToken(customerUserDetails);
-        return mapUserToUseDTO(user, accessToken, refreshToken);
+
+        Account account = accountRepository.findAccountByCustomer(user);
+
+        return mapUserToUseDTO(user, accessToken, refreshToken, account.getAccountNumber(),account.getAccountType());
     }
 
     @Override
@@ -93,13 +102,15 @@ public class UserServiceImpl implements IUserService {
     }
 
 
-    public static CurrentUserDTO mapUserToUseDTO(User user, String accessToken, String refreshToken) {
+    public static CurrentUserDTO mapUserToUseDTO(User user, String accessToken, String refreshToken, Long accountNumber, AccountType accountType) {
         CurrentUserDTO currentUserDTO = new CurrentUserDTO();
         currentUserDTO.setId(user.getId());
         currentUserDTO.setUsername(user.getUsername());
         currentUserDTO.setName(user.getName());
         currentUserDTO.setAccessToken(accessToken);
         currentUserDTO.setRefreshToken(refreshToken);
+        currentUserDTO.setAccountNumber(accountNumber);
+        currentUserDTO.setAccountType(accountType);
         return currentUserDTO;
     }
 

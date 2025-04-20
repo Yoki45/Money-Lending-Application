@@ -3,6 +3,9 @@ package com.lms.customer.user;
 import com.lms.generic.exception.BadRequestException;
 import com.lms.generic.localization.ILocalizationService;
 import com.lms.security.service.JwtService;
+import com.lms.system.customer.account.enums.AccountType;
+import com.lms.system.customer.account.model.Account;
+import com.lms.system.customer.account.repository.AccountRepository;
 import com.lms.system.customer.account.service.IAccountService;
 import com.lms.system.customer.user.dto.CurrentUserDTO;
 import com.lms.system.customer.user.dto.LoginDTO;
@@ -47,6 +50,9 @@ public class UserServiceImplTest {
 
     @Mock
     private IAccountService accountService;
+
+    @Mock
+    private AccountRepository accountRepository;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -95,6 +101,12 @@ public class UserServiceImplTest {
                 .name("John Doe")
                 .build();
 
+        Account account = Account.builder()
+                .accountNumber(123456789L)
+                .accountType(AccountType.SAVINGS)
+                .customer(user)
+                .build();
+
         Authentication auth = mock(Authentication.class);
 
         when(authenticationManager.authenticate(any()))
@@ -102,6 +114,8 @@ public class UserServiceImplTest {
         when(auth.isAuthenticated()).thenReturn(true);
         when(userRepository.findByUsername("user@example.com"))
                 .thenReturn(Optional.of(user));
+        when(accountRepository.findAccountByCustomer(user))
+                .thenReturn(account);
         when(jwtService.generateToken(any()))
                 .thenReturn("access-token");
         when(jwtService.generateRefreshToken(any()))
@@ -112,6 +126,8 @@ public class UserServiceImplTest {
         assertEquals("user@example.com", userDTO.getUsername());
         assertEquals("access-token", userDTO.getAccessToken());
         assertEquals("refresh-token", userDTO.getRefreshToken());
+        assertEquals(123456789L, userDTO.getAccountNumber());
+        assertEquals(AccountType.SAVINGS, userDTO.getAccountType());
     }
 
     @Test
