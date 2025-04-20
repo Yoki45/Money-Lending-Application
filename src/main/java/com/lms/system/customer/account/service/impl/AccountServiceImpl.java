@@ -105,7 +105,7 @@ public class AccountServiceImpl implements IAccountService {
         }
 
         account.setBalance(account.getBalance() - depositAmount);
-        account.setDeposits(account.getWithdrawals() + depositAmount);
+        account.setWithdrawals(account.getWithdrawals() + depositAmount);
         accountRepository.save(account);
 
         createAndSaveTransaction(account, depositAmount, TransactionType.WITHDRAWAL);
