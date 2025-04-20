@@ -1,0 +1,21 @@
+CREATE TABLE `product_fees` (
+                                `id` bigint NOT NULL AUTO_INCREMENT,
+                                `created_on` datetime(6) NOT NULL,
+                                `updated_on` datetime(6) DEFAULT NULL,
+                                `active_status` enum('ACTIVE','INACTIVE') NOT NULL,
+                                `amount` double NOT NULL,
+                                `apply_on_disbursement` bit(1) NOT NULL,
+                                `fee_type` enum('DAILY','LATE','SERVICE') NOT NULL,
+                                `is_percentage` bit(1) NOT NULL,
+                                `trigger_days` int DEFAULT NULL,
+                                `created_by` bigint DEFAULT NULL,
+                                `updated_by` bigint DEFAULT NULL,
+                                `product` bigint NOT NULL,
+                                PRIMARY KEY (`id`),
+                                KEY `FK4p84p58y4c5kmt39laxmu6tcr` (`created_by`),
+                                KEY `FKq7u2ljx6oqg4ooie6co2qnehl` (`updated_by`),
+                                KEY `FK7gjbpjpyk0rnyq2iqtd96sdpw` (`product`),
+                                CONSTRAINT `FK4p84p58y4c5kmt39laxmu6tcr` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+                                CONSTRAINT `FK7gjbpjpyk0rnyq2iqtd96sdpw` FOREIGN KEY (`product`) REFERENCES `products` (`id`),
+                                CONSTRAINT `FKq7u2ljx6oqg4ooie6co2qnehl` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

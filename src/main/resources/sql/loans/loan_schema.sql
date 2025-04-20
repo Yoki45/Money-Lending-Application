@@ -1,0 +1,26 @@
+CREATE TABLE `loans`
+(
+    `id`             bigint NOT NULL AUTO_INCREMENT,
+    `created_on`     datetime(6) NOT NULL,
+    `updated_on`     datetime(6) DEFAULT NULL,
+    `amount` double DEFAULT NULL,
+    `balance` double DEFAULT NULL,
+    `due_date`       datetime(6) DEFAULT NULL,
+    `extension_date` datetime(6) DEFAULT NULL,
+    `loan_type`      enum('CONSOLIDATED','DEFAULT') DEFAULT NULL,
+    `repaid_date`    datetime(6) DEFAULT NULL,
+    `loan_status`    enum('CANCELLED','CLOSED','OPEN','OVERDUE','WRITTEN_OFF') NOT NULL,
+    `created_by`     bigint DEFAULT NULL,
+    `updated_by`     bigint DEFAULT NULL,
+    `account`        bigint NOT NULL,
+    `product`        bigint NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY              `FKfhj3gnsj6i6cmw4bubcsds3wd` (`created_by`),
+    KEY              `FKsfce2w9map2tcxtbs0xv5syp6` (`updated_by`),
+    KEY              `FKf599yqn4mbfbas95sbg0k5pxq` (`account`),
+    KEY              `FKd12p2nctvfwiep5t64t77ol4h` (`product`),
+    CONSTRAINT `FKd12p2nctvfwiep5t64t77ol4h` FOREIGN KEY (`product`) REFERENCES `products` (`id`),
+    CONSTRAINT `FKf599yqn4mbfbas95sbg0k5pxq` FOREIGN KEY (`account`) REFERENCES `accounts` (`account_number`),
+    CONSTRAINT `FKfhj3gnsj6i6cmw4bubcsds3wd` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+    CONSTRAINT `FKsfce2w9map2tcxtbs0xv5syp6` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
